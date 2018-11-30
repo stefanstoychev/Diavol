@@ -33,7 +33,7 @@ function create () {
   tiles = game.add.group()
 	
   for (var i = 0; i < 12; i++) {
-	  for (var j = 0; j < 12; j++) {
+	  for (var j = 0; j < 3; j++) {
 		let tile = tiles.create(i * 80, j * 40, 'tiles', Math.floor((Math.random() * 100) + 1))
 	  }
   }
