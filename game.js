@@ -31,10 +31,14 @@ function create () {
   game.add.sprite(0, 0, 'sky')
   
   tiles = game.add.group()
-	
+
+  let tile_scale = 2;
+  
   for (var i = 0; i < 12; i++) {
 	  for (var j = 0; j < 3; j++) {
-		let tile = tiles.create(i * 80, j * 40, 'tiles', Math.floor((Math.random() * 100) + 1))
+		let frame_number = Math.floor((Math.random() * 100) + 1)
+		let tile = tiles.create(i * 80 * tile_scale, j * 40 * tile_scale, 'tiles', frame_number)
+		tile.scale.setTo(tile_scale, tile_scale)
 	  }
   }
   
