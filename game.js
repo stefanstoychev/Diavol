@@ -12,11 +12,14 @@ let diamonds
 let cursors
 let player
 
+
 function preload () {
   // Load & Define our game assets
   game.load.image('sky', 'sky.png')
   game.load.image('ground', 'platform.png')
   game.load.image('diamond', 'diamond.png')
+  game.load.spritesheet('tiles', 'RuinGroundTiles.png', 160, 80)
+  
   game.load.spritesheet('woof', 'woof.png', 32, 32)
 }
 
@@ -26,7 +29,15 @@ function create () {
 
     //  A simple background for our game
   game.add.sprite(0, 0, 'sky')
-
+  
+  tiles = game.add.group()
+	
+  for (var i = 0; i < 12; i++) {
+	  for (var j = 0; j < 12; j++) {
+		let tile = tiles.create(i * 80, j * 40, 'tiles', Math.floor((Math.random() * 100) + 1))
+	  }
+  }
+  
     //  The platforms group contains the ground and the 2 ledges we can jump on
   platforms = game.add.group()
 
