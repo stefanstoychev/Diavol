@@ -11,6 +11,7 @@ let platforms
 let diamonds
 let cursors
 let player
+let barb
 
 
 function preload () {
@@ -21,6 +22,7 @@ function preload () {
   game.load.spritesheet('tiles', 'RuinGroundTiles.png', 160, 80)
   
   game.load.spritesheet('woof', 'woof.png', 32, 32)
+  game.load.spritesheet('barb', 'walk.png', 88, 99)
 }
 
 function create () {
@@ -64,7 +66,12 @@ function create () {
   ledge = platforms.create(-75, 350, 'ground')
   ledge.body.immovable = true
 
-    // The player and its settings
+  barb = game.add.sprite(32, 150, 'barb')
+  
+  barb.animations.add('left', [32,33, 34, 35, 36, 37, 38, 39], 10, true)
+  barb.animations.add('right', [96, 97, 98, 99, 100, 101, 102, 103], 10, true)
+  
+  // The player and its settings
   player = game.add.sprite(32, game.world.height - 150, 'woof')
 
     //  We need to enable physics on the player
@@ -117,13 +124,21 @@ function update () {
     player.body.velocity.x = -150
 
     player.animations.play('left')
+	
+	barb.animations.play('left')
+	barb.x-=2
+	
   } else if (cursors.right.isDown) {
     player.body.velocity.x = 150
 
     player.animations.play('right')
+	
+	barb.animations.play('right')
+	barb.x+=2
   } else {
     // If no movement keys are pressed, stop the player
     player.animations.stop()
+	barb.animations.stop()
   }
 
     //  This allows the player to jump!
