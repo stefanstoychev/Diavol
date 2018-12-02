@@ -3,6 +3,8 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io').listen(server);
 
+const PORT = process.env.PORT || 8081
+
 app.use('/css',express.static(__dirname + '/css'));
 app.use('/js',express.static(__dirname + '/js'));
 app.use('/assets',express.static(__dirname + '/assets'));
@@ -13,7 +15,7 @@ app.get('/',function(req,res){
 
 server.lastPlayderID = 0;
 
-server.listen(process.env.PORT || 8081,function(){
+server.listen(PORT, function(){
     console.log('Listening on '+server.address().port);
 });
 
