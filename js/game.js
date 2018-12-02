@@ -1,8 +1,8 @@
 // Initialize the Phaser Game object and set default game window size
-const game = new Phaser.Game(800, 600, Phaser.AUTO, '', {
-  preload: preload,
-  create: create,
-  update: update })
+//const game = new Phaser.Game(800, 600, Phaser.AUTO, '', {
+//  preload: preload,
+//  create: create,
+//  update: update })
 
 // Declare shared variables at the top so all methods can access them
 let score = 0
@@ -14,23 +14,31 @@ let player
 let barb
 
 
-function preload () {
+var Game = {};
+
+Game.init = function(){
+    game.stage.disableVisibilityChange = true;
+};
+
+Game.preload = function() {
   // Load & Define our game assets
-  game.load.image('sky', 'sky.png')
-  game.load.image('ground', 'platform.png')
-  game.load.image('diamond', 'diamond.png')
-  game.load.spritesheet('tiles', 'RuinGroundTiles.png', 160, 80)
+  game.load.image('sky', 'assets/sky.png')
+  game.load.image('ground', 'assets/platform.png')
+  game.load.image('diamond', 'assets/diamond.png')
+  game.load.spritesheet('tiles', 'assets/RuinGroundTiles.png', 160, 80)
   
-  game.load.spritesheet('woof', 'woof.png', 32, 32)
-  game.load.spritesheet('barb', 'walk.png', 88, 99)
+  game.load.spritesheet('woof', 'assets/woof.png', 32, 32)
+  game.load.spritesheet('barb', 'assets/walk.png', 88, 99)
 }
 
-function create () {
+Game.create = function(){
+  Game.playerMap = {};
+ 
     //  We're going to be using physics, so enable the Arcade Physics system
   game.physics.startSystem(Phaser.Physics.ARCADE)
 
     //  A simple background for our game
-  game.add.sprite(0, 0, 'sky')
+  sky = game.add.sprite(0, 0, 'sky')
   
   tiles = game.add.group()
 
@@ -72,20 +80,20 @@ function create () {
   barb.animations.add('right', [96, 97, 98, 99, 100, 101, 102, 103], 10, true)
   
   // The player and its settings
-  player = game.add.sprite(32, game.world.height - 150, 'woof')
+  //player = game.add.sprite(32, game.world.height - 150, 'woof')
 
     //  We need to enable physics on the player
-  game.physics.arcade.enable(player)
+  //game.physics.arcade.enable(player)
 
     //  Player physics properties. Give the little guy a slight bounce.
-  player.body.bounce.y = 0.2
-  player.body.gravity.y = 800
-  player.body.collideWorldBounds = true
+  //player.body.bounce.y = 0.2
+  //player.body.gravity.y = 800
+ // player.body.collideWorldBounds = true
 
     //  Our two animations, walking left and right.
-  player.animations.add('left', [0, 1], 10, true)
-  player.animations.add('right', [2, 3], 10, true)
-
+  //player.animations.add('left', [0, 1], 10, true)
+ // player.animations.add('right', [2, 3], 10, true)
+   woof = createWloof();
     //  Finally some diamonds to collect
   diamonds = game.add.group()
 
@@ -106,10 +114,48 @@ function create () {
 
     //  And bootstrap our controls
   cursors = game.input.keyboard.createCursorKeys()
-}
+    
+	//sky.inputEnabled = true; // Allows clicking on the map ; it's enough to do it on the last layer
+    //sky.events.onInputUp.add(Game.getCoordinates, this);
+	  // Configure the controls!
+	//sky.inputEnabled = true;
+	//sky.events.onInputUp.add(Game.getCoordinates(woof));
+    Client.askNewPlayer();
 
-function update () {
-    //  We want the player to stop when not moving
+  }
+  
+  //Game.getCoordinates = function(layer,pointer){
+ //   Client.sendClick(pointer.worldX,pointer.worldY);
+//};
+
+  Game.getCoordinates = function(player){
+    Client.sendClick(player.x, player.y);
+	console.log(player.x + " / " + player.y)
+};
+
+Game.addNewPlayer = function(id,x,y){
+  
+	Game.playerMap[id] = createWloof();
+};
+
+Game.movePlayer = function(id,x,y){
+    var player = Game.playerMap[id];
+//    var distance = Phaser.Math.distance(player.x,player.y,x,y);
+//   var tween = game.add.tween(player);
+//    var duration = distance*10;
+//    tween.to({x:x,y:y}, duration);
+//    tween.start();
+
+};
+
+Game.removePlayer = function(id){
+	console.log(Game.playerMap[id]);
+   Game.playerMap[id].destroy();
+   delete Game.playerMap[id];
+};
+
+Game.update = function () {
+   //  We want the player to stop when not moving
   player.body.velocity.x = 0
 
     //  Setup collisions for the player, diamonds, and our platforms
@@ -159,4 +205,20 @@ function collectDiamond (player, diamond) {
     //  And update the score
   score += 10
   scoreText.text = 'Score: ' + score
+}
+
+function createWloof(){
+  player = game.add.sprite(32, game.world.height - 150, 'woof')
+
+    //  We need to enable physics on the player
+  game.physics.arcade.enable(player)
+
+    //  Player physics properties. Give the little guy a slight bounce.
+  player.body.bounce.y = 0.2
+  player.body.gravity.y = 800
+  player.body.collideWorldBounds = true
+
+    //  Our two animations, walking left and right.
+  player.animations.add('left', [0, 1], 10, true)
+  player.animations.add('right', [2, 3], 10, true)
 }
