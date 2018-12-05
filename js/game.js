@@ -32,86 +32,31 @@ Game.preload = function() {
 }
 
 Game.create = function(){
- 
-    //  We're going to be using physics, so enable the Arcade Physics system
-  game.physics.startSystem(Phaser.Physics.ARCADE)
 
-    //  A simple background for our game
+  game.physics.startSystem(Phaser.Physics.ARCADE)
   sky = game.add.sprite(0, 0, 'sky')
   
   tiles = game.add.group()
-  
-    //  The platforms group contains the ground and the 2 ledges we can jump on
   platforms = game.add.group()
-
-    //  We will enable physics for any object that is created in this group
+  
   platforms.enableBody = true
-
-    // Here we create the ground.
   let ground = platforms.create(0, game.world.height - 64, 'ground')
-
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+  
   ground.scale.setTo(2, 2)
-
-    //  This stops it from falling away when you jump on it
   ground.body.immovable = true
-
-    //  Now let's create two ledges
+  
   let ledge = platforms.create(400, 450, 'ground')
   ledge.body.immovable = true
 
   ledge = platforms.create(-75, 350, 'ground')
   ledge.body.immovable = true
+  cursors = game.input.keyboard.createCursorKeys() 
+  Client.askNewPlayer()
+}
+ 
 
-  //barb = game.add.sprite(32, 150, 'barb')
-  
-  //barb.animations.add('left', [32,33, 34, 35, 36, 37, 38, 39], 10, true)
-  //barb.animations.add('right', [96, 97, 98, 99, 100, 101, 102, 103], 10, true)
-  
-  // The player and its settings
-  //player = game.add.sprite(32, game.world.height - 150, 'woof')
-
-    //  We need to enable physics on the player
-  //game.physics.arcade.enable(player)
-
-    //  Player physics properties. Give the little guy a slight bounce.
-  //player.body.bounce.y = 0.2
-  //player.body.gravity.y = 800
- // player.body.collideWorldBounds = true
-
-    //  Our two animations, walking left and right.
-  //player.animations.add('left', [0, 1], 10, true)
- // player.animations.add('right', [2, 3], 10, true)
-
-	
-    //  And bootstrap our controls
-    cursors = game.input.keyboard.createCursorKeys()
-    
-	//sky.inputEnabled = true; // Allows clicking on the map ; it's enough to do it on the last layer
-    //sky.events.onInputUp.add(Game.getCoordinates, this);
-	  // Configure the controls!
-	//sky.inputEnabled = true;
-	//sky.events.onInputUp.add(Game.getCoordinates(woof));
-	//if (player != null || player !== undefined) { 
-	
-	Client.askNewPlayer()
-	
-	 //getCoordinates(player, cursors)	
-	
-//	}
-	
-   
-  }
-  
-  //Game.getCoordinates = function(layer,pointer){
- //   Client.sendClick(pointer.worldX,pointer.worldY);
-//};
-
-<<<<<<< HEAD
-Game.getCoordinates = function(player, cursors){
-=======
 Game.getCoordinates = function(player){
->>>>>>> 27cde5bed24de5945670e24c8e23cd08683f33d4
+
     Client.sendClick(player.x, player.y);
 	console.log(player.x + " / " + player.y)
 };
@@ -139,7 +84,7 @@ Game.createTerain = function() {
 
 	 player.body.velocity.x = 0
 
-	//  Setup collisions for the player, diamonds, and our platforms
+	//Setup collisions for the player, diamonds, and our platforms
 	game.physics.arcade.collide(player, platforms)
 	game.physics.arcade.collide(diamonds, platforms)
 }
@@ -151,8 +96,6 @@ Game.movePlayer = function(id,x,y){
 
     tween.to({x:x,y:y}, 1000);
    tween.start();
-   //player.body.velocity.x = x;
-  // player.body.velocity.y = y;
 };
 
 Game.update = function(){
@@ -162,9 +105,6 @@ Game.update = function(){
 			//  Setup collisions for the player, diamonds, and our platforms
 			game.physics.arcade.collide(player, platforms)
 			game.physics.arcade.collide(diamonds, platforms)
-
-			//  Call callectionDiamond() if player overlaps with a diamond
-			//game.physics.arcade.overlap(player, diamonds, collectDiamond, null, this)
 			
 			// Configure the controls!
 			if (cursors.left.isDown) {
@@ -180,13 +120,10 @@ Game.update = function(){
 			
 				player.animations.play('right')
 				getCoordinates(player)
-				//barb.animations.play('right')
-				//barb.x+=2
+			 
 			} else {
 				// If no movement keys are pressed, stop the player
 				player.animations.stop()
-				//barb.animations.stop()
-				//getCoordinates(player)
 			}
 			
 				//  This allows the player to jump!
