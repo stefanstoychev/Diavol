@@ -13,8 +13,8 @@ let cursors
 let player
 let barb
 
-
 var Game = {};
+var playerMap = {}; 
 
 Game.init = function(){
     game.stage.disableVisibilityChange = true;
@@ -32,7 +32,6 @@ Game.preload = function() {
 }
 
 Game.create = function(){
-  Game.playerMap = {};
  
     //  We're going to be using physics, so enable the Arcade Physics system
   game.physics.startSystem(Phaser.Physics.ARCADE)
@@ -41,16 +40,6 @@ Game.create = function(){
   sky = game.add.sprite(0, 0, 'sky')
   
   tiles = game.add.group()
-
-  let tile_scale = 2;
-  
-  for (var i = 0; i < 12; i++) {
-	  for (var j = 0; j < 3; j++) {
-		let frame_number = Math.floor((Math.random() * 100) + 1)
-		let tile = tiles.create(i * 80 * tile_scale, j * 40 * tile_scale, 'tiles', frame_number)
-		tile.scale.setTo(tile_scale, tile_scale)
-	  }
-  }
   
     //  The platforms group contains the ground and the 2 ledges we can jump on
   platforms = game.add.group()
@@ -74,10 +63,10 @@ Game.create = function(){
   ledge = platforms.create(-75, 350, 'ground')
   ledge.body.immovable = true
 
-  barb = game.add.sprite(32, 150, 'barb')
+  //barb = game.add.sprite(32, 150, 'barb')
   
-  barb.animations.add('left', [32,33, 34, 35, 36, 37, 38, 39], 10, true)
-  barb.animations.add('right', [96, 97, 98, 99, 100, 101, 102, 103], 10, true)
+  //barb.animations.add('left', [32,33, 34, 35, 36, 37, 38, 39], 10, true)
+  //barb.animations.add('right', [96, 97, 98, 99, 100, 101, 102, 103], 10, true)
   
   // The player and its settings
   //player = game.add.sprite(32, game.world.height - 150, 'woof')
@@ -93,132 +82,125 @@ Game.create = function(){
     //  Our two animations, walking left and right.
   //player.animations.add('left', [0, 1], 10, true)
  // player.animations.add('right', [2, 3], 10, true)
-   woof = createWloof();
-    //  Finally some diamonds to collect
-  diamonds = game.add.group()
 
-    //  Enable physics for any object that is created in this group
-  diamonds.enableBody = true
-
-    //  Create 12 diamonds evenly spaced apart
-  for (var i = 0; i < 12; i++) {
-    let diamond = diamonds.create(i * 70, 0, 'diamond')
-
-      //  Drop em from the sky and bounce a bit
-    diamond.body.gravity.y = 1000
-    diamond.body.bounce.y = 0.3 + Math.random() * 0.2
-  }
-
-    //  Create the score text
-  scoreText = game.add.text(16, 16, '', { fontSize: '32px', fill: '#000' })
-
+	
     //  And bootstrap our controls
-  cursors = game.input.keyboard.createCursorKeys()
+    cursors = game.input.keyboard.createCursorKeys()
     
 	//sky.inputEnabled = true; // Allows clicking on the map ; it's enough to do it on the last layer
     //sky.events.onInputUp.add(Game.getCoordinates, this);
 	  // Configure the controls!
 	//sky.inputEnabled = true;
 	//sky.events.onInputUp.add(Game.getCoordinates(woof));
-    Client.askNewPlayer();
-
+	//if (player != null || player !== undefined) { 
+	
+	Client.askNewPlayer()
+	
+	 //getCoordinates(player, cursors)	
+	
+//	}
+	
+   
   }
   
   //Game.getCoordinates = function(layer,pointer){
  //   Client.sendClick(pointer.worldX,pointer.worldY);
 //};
 
-  Game.getCoordinates = function(player){
+Game.getCoordinates = function(player, cursors){
     Client.sendClick(player.x, player.y);
 	console.log(player.x + " / " + player.y)
 };
 
 Game.addNewPlayer = function(id,x,y){
-  
-	Game.playerMap[id] = createWloof();
+	
+	 playerMap[id] = game.add.sprite(x, y - 150, 'woof')
+     player = playerMap[id]
+     game.physics.arcade.enable(player)
+	 
+	 //player physics properties. Give the little guy a slight bounce.
+	 player.body.bounce.y = 0.2
+	 player.body.gravity.y = 800
+	 player.body.collideWorldBounds = true
+
+     //Our two animations, walking left and right.
+	 player.animations.add('left', [0, 1], 10, true)
+	 player.animations.add('right', [2, 3], 10, true)
+	
+	 console.log(playerMap[id])
 };
+
+Game.createTerain = function() {
+	 console.log('crazy' + player)
+
+	 player.body.velocity.x = 0
+
+	//  Setup collisions for the player, diamonds, and our platforms
+	game.physics.arcade.collide(player, platforms)
+	game.physics.arcade.collide(diamonds, platforms)
+}
+
 
 Game.movePlayer = function(id,x,y){
-    var player = Game.playerMap[id];
-//    var distance = Phaser.Math.distance(player.x,player.y,x,y);
-//   var tween = game.add.tween(player);
-//    var duration = distance*10;
-//    tween.to({x:x,y:y}, duration);
-//    tween.start();
+    var player = playerMap[id];
+    var tween = game.add.tween(player);
 
+    tween.to({x:x,y:y}, 1000);
+   tween.start();
+   //player.body.velocity.x = x;
+  // player.body.velocity.y = y;
 };
+
+Game.update = function(){
+		setTimeout(function(){
+			player.body.velocity.x = 0
+
+			//  Setup collisions for the player, diamonds, and our platforms
+			game.physics.arcade.collide(player, platforms)
+			game.physics.arcade.collide(diamonds, platforms)
+
+			//  Call callectionDiamond() if player overlaps with a diamond
+			//game.physics.arcade.overlap(player, diamonds, collectDiamond, null, this)
+			
+			// Configure the controls!
+			if (cursors.left.isDown) {
+				player.body.velocity.x = -150
+			
+				player.animations.play('left')
+				getCoordinates(player)
+				//barb.animations.play('left')
+				//barb.x-=2
+				
+			} else if (cursors.right.isDown) {
+				player.body.velocity.x = 150
+			
+				player.animations.play('right')
+				getCoordinates(player)
+				//barb.animations.play('right')
+				//barb.x+=2
+			} else {
+				// If no movement keys are pressed, stop the player
+				player.animations.stop()
+				//barb.animations.stop()
+				//getCoordinates(player)
+			}
+			
+				//  This allows the player to jump!
+			if (cursors.up.isDown && player.body.touching.down) {
+				player.body.velocity.y = -400
+				getCoordinates(player)
+			}
+				// Show an alert modal when score reaches 120
+			if (score === 120) {
+				alert('You win!')
+				score = 0
+			}
+		}, 1000)
+}
 
 Game.removePlayer = function(id){
-	console.log(Game.playerMap[id]);
-   Game.playerMap[id].destroy();
-   delete Game.playerMap[id];
+   console.log(playerMap[id]);
+   playerMap[id].destroy();
+   delete playerMap[id];
 };
 
-Game.update = function () {
-   //  We want the player to stop when not moving
-  player.body.velocity.x = 0
-
-    //  Setup collisions for the player, diamonds, and our platforms
-  game.physics.arcade.collide(player, platforms)
-  game.physics.arcade.collide(diamonds, platforms)
-
-    //  Call callectionDiamond() if player overlaps with a diamond
-  game.physics.arcade.overlap(player, diamonds, collectDiamond, null, this)
-
-    // Configure the controls!
-  if (cursors.left.isDown) {
-    player.body.velocity.x = -150
-
-    player.animations.play('left')
-	
-	barb.animations.play('left')
-	barb.x-=2
-	
-  } else if (cursors.right.isDown) {
-    player.body.velocity.x = 150
-
-    player.animations.play('right')
-	
-	barb.animations.play('right')
-	barb.x+=2
-  } else {
-    // If no movement keys are pressed, stop the player
-    player.animations.stop()
-	barb.animations.stop()
-  }
-
-    //  This allows the player to jump!
-  if (cursors.up.isDown && player.body.touching.down) {
-    player.body.velocity.y = -400
-  }
-    // Show an alert modal when score reaches 120
-  if (score === 120) {
-    alert('You win!')
-    score = 0
-  }
-}
-
-function collectDiamond (player, diamond) {
-    // Removes the diamond from the screen
-  diamond.kill()
-
-    //  And update the score
-  score += 10
-  scoreText.text = 'Score: ' + score
-}
-
-function createWloof(){
-  player = game.add.sprite(32, game.world.height - 150, 'woof')
-
-    //  We need to enable physics on the player
-  game.physics.arcade.enable(player)
-
-    //  Player physics properties. Give the little guy a slight bounce.
-  player.body.bounce.y = 0.2
-  player.body.gravity.y = 800
-  player.body.collideWorldBounds = true
-
-    //  Our two animations, walking left and right.
-  player.animations.add('left', [0, 1], 10, true)
-  player.animations.add('right', [2, 3], 10, true)
-}
