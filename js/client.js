@@ -14,12 +14,14 @@ Client.askNewPlayer = function(){
     Client.socket.emit('newplayer');
 };
 
-Client.sendClick = function(x,y){
+Client.sendClick = function(x,y,cursors){
   Client.socket.emit('click',{x:x,y:y});
 };
 
 Client.socket.on('newplayer',function(data){
     Game.addNewPlayer(data.id,data.x,data.y);
+	Game.createTerain();
+	Game.update();
 });
 
 Client.socket.on('allplayers',function(data){
