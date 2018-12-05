@@ -1,3 +1,3 @@
 # Diavol
 
-https://diavol.herokuapp.com/index.html
+https://diavol.herokuapp.com
