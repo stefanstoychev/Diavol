@@ -107,7 +107,7 @@ Game.create = function(){
  //   Client.sendClick(pointer.worldX,pointer.worldY);
 //};
 
-Game.getCoordinates = function(player, cursors){
+Game.getCoordinates = function(player){
     Client.sendClick(player.x, player.y);
 	console.log(player.x + " / " + player.y)
 };
