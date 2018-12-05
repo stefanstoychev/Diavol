@@ -32,6 +32,7 @@ Game.preload = function() {
 }
 
 Game.create = function(){
+console.log("Create this happened")
 
   game.physics.startSystem(Phaser.Physics.ARCADE)
   sky = game.add.sprite(0, 0, 'sky')
@@ -51,30 +52,35 @@ Game.create = function(){
   ledge = platforms.create(-75, 350, 'ground')
   ledge.body.immovable = true
   cursors = game.input.keyboard.createCursorKeys() 
+  
+  sky.inputEnabled = true;
+  sky.events.onInputDown.add(Game.getCoordinates, this);
   Client.askNewPlayer()
+  
+  console.log("Retrieved player -> " + player)
 }
  
 
-Game.getCoordinates = function(player){
-
-    Client.sendClick(player.x, player.y);
-	console.log(player.x + " / " + player.y)
+Game.getCoordinates = function(layer,pointer){
+	console.log("Create this happened")
+    Client.sendClick(pointer.worldX,pointer.worldY);
+	//console.log(player.x + " / " + player.y)
 };
 
 Game.addNewPlayer = function(id,x,y){
 	
-	 playerMap[id] = game.add.sprite(x, y - 150, 'woof')
-     player = playerMap[id]
-     game.physics.arcade.enable(player)
+	 playerMap[id] = game.add.sprite(x, y, 'woof')
+     //player = playerMap[id]
+     //game.physics.arcade.enable(player)
 	 
 	 //player physics properties. Give the little guy a slight bounce.
-	 player.body.bounce.y = 0.2
-	 player.body.gravity.y = 800
-	 player.body.collideWorldBounds = true
+	 //player.body.bounce.y = 0.2
+	 //player.body.gravity.y = 800
+	 //player.body.collideWorldBounds = true
 
      //Our two animations, walking left and right.
-	 player.animations.add('left', [0, 1], 10, true)
-	 player.animations.add('right', [2, 3], 10, true)
+	 //player.animations.add('left', [0, 1], 10, true)
+	 //player.animations.add('right', [2, 3], 10, true)
 	
 	 console.log(playerMap[id])
 };
@@ -89,55 +95,13 @@ Game.createTerain = function() {
 	game.physics.arcade.collide(diamonds, platforms)
 }
 
-
 Game.movePlayer = function(id,x,y){
+	player = playerMap[id];
     var player = playerMap[id];
-    var tween = game.add.tween(player);
-
-    tween.to({x:x,y:y}, 1000);
-   tween.start();
+    player.x = x;
+	player.y = y;
 };
 
-Game.update = function(){
-		setTimeout(function(){
-			player.body.velocity.x = 0
-
-			//  Setup collisions for the player, diamonds, and our platforms
-			game.physics.arcade.collide(player, platforms)
-			game.physics.arcade.collide(diamonds, platforms)
-			
-			// Configure the controls!
-			if (cursors.left.isDown) {
-				player.body.velocity.x = -150
-			
-				player.animations.play('left')
-				getCoordinates(player)
-				//barb.animations.play('left')
-				//barb.x-=2
-				
-			} else if (cursors.right.isDown) {
-				player.body.velocity.x = 150
-			
-				player.animations.play('right')
-				getCoordinates(player)
-			 
-			} else {
-				// If no movement keys are pressed, stop the player
-				player.animations.stop()
-			}
-			
-				//  This allows the player to jump!
-			if (cursors.up.isDown && player.body.touching.down) {
-				player.body.velocity.y = -400
-				getCoordinates(player)
-			}
-				// Show an alert modal when score reaches 120
-			if (score === 120) {
-				alert('You win!')
-				score = 0
-			}
-		}, 1000)
-}
 
 Game.removePlayer = function(id){
    console.log(playerMap[id]);

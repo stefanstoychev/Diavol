@@ -20,8 +20,6 @@ Client.sendClick = function(x,y,cursors){
 
 Client.socket.on('newplayer',function(data){
     Game.addNewPlayer(data.id,data.x,data.y);
-	Game.createTerain();
-	Game.update();
 });
 
 Client.socket.on('allplayers',function(data){
