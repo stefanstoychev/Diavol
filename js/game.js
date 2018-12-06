@@ -27,7 +27,6 @@ Game.preload = function() {
   game.load.image('diamond', 'assets/diamond.png')
   game.load.spritesheet('tiles', 'assets/RuinGroundTiles.png', 160, 80)
   
-  game.load.spritesheet('woof', 'assets/woof.png', 32, 32)
   game.load.spritesheet('barb', 'assets/walk.png', 88, 99)
 }
 
@@ -64,24 +63,11 @@ console.log("Create this happened")
 Game.getCoordinates = function(layer,pointer){
 	console.log("Create this happened")
     Client.sendClick(pointer.worldX,pointer.worldY);
-	//console.log(player.x + " / " + player.y)
 };
 
 Game.addNewPlayer = function(id,x,y){
 	
-	 playerMap[id] = game.add.sprite(x, y, 'woof')
-     //player = playerMap[id]
-     //game.physics.arcade.enable(player)
-	 
-	 //player physics properties. Give the little guy a slight bounce.
-	 //player.body.bounce.y = 0.2
-	 //player.body.gravity.y = 800
-	 //player.body.collideWorldBounds = true
-
-     //Our two animations, walking left and right.
-	 //player.animations.add('left', [0, 1], 10, true)
-	 //player.animations.add('right', [2, 3], 10, true)
-	
+	 playerMap[id] = game.add.sprite(x, y, 'barb')
 	 console.log(playerMap[id])
 };
 
