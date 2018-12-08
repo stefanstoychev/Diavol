@@ -59,15 +59,29 @@ console.log("Create this happened")
   console.log("Retrieved player -> " + player)
 }
  
+Game.getCoordinates = function(layer, pointer){
+    console.log("Create this happened")
 
-Game.getCoordinates = function(layer,pointer){
-	console.log("Create this happened")
-    Client.sendClick(pointer.worldX,pointer.worldY);
+    rotation = game.physics.arcade.angleToPointer(player);
+    Client.sendClick(pointer.worldX,pointer.worldY, rotation);
 };
 
 Game.addNewPlayer = function(id,x,y){
 	
-	 playerMap[id] = game.add.sprite(x, y, 'barb')
+     playerMap[id] = game.add.sprite(x, y, 'barb')
+     
+     player = playerMap[id];
+
+    player.pivot.x= 44;
+    player.pivot.y= 49;
+
+     for(i = 0 ;i < 15; i++){
+        key = 'walk' + i;
+        console.log(key)
+        frames = Array.from(new Array(7), (x,j) => j + i*8);
+        player.animations.add(key, frames, 16, true)
+     }
+
 	 console.log(playerMap[id])
 };
 
@@ -81,11 +95,21 @@ Game.createTerain = function() {
 	game.physics.arcade.collide(diamonds, platforms)
 }
 
-Game.movePlayer = function(id,x,y){
-	player = playerMap[id];
+Game.movePlayer = function(id ,x ,y , rotation){
     var player = playerMap[id];
+    
     player.x = x;
-	player.y = y;
+    player.y = y;
+    
+    angleInRads = rotation+Math.PI;
+    normalised = angleInRads/(2*Math.PI);
+    animationIndex =(Math.round(normalised*16)+4)%16;
+
+    console.log('rads: ' + angleInRads + 'norm: ' + normalised + 'key: ' + animationIndex)
+
+    key = 'walk' +  animationIndex.toString();
+
+    player.animations.play(key);
 };
 
 

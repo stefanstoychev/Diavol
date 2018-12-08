@@ -22,17 +22,19 @@ io.on('connection',function(socket){
     socket.on('newplayer',function(){
         socket.player = {
             id: server.lastPlayderID++,
-			x:  32,
-            y: 400
+			x:  150,
+            y: 150
         };
 		
         socket.emit('allplayers',getAllPlayers());
         socket.broadcast.emit('newplayer',socket.player);
 
         socket.on('click',function(data){
-            console.log('click to '+data.x+', '+data.y);
+            console.log('click to '+data.x+', '+data.y+', '+data.rotation);
             socket.player.x = data.x;
             socket.player.y = data.y;
+            socket.player.rotation = data.rotation;
+
             io.emit('move',socket.player);
         });
 
