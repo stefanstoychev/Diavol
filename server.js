@@ -13,7 +13,7 @@ app.get('/',function(req,res){
 
 server.lastPlayderID = 0;
 
-server.listen(process.env.PORT || 8081,function(){
+server.listen(process.env.PORT || 8088,function(){
     console.log('Listening on '+server.address().port);
 });
 
@@ -22,18 +22,19 @@ io.on('connection',function(socket){
     socket.on('newplayer',function(){
         socket.player = {
             id: server.lastPlayderID++,
-			x:  150,
+			      x:  150,
             y: 150
         };
-		
+
         socket.emit('allplayers',getAllPlayers());
         socket.broadcast.emit('newplayer',socket.player);
 
         socket.on('click',function(data){
-            console.log('click to '+data.x+', '+data.y+', '+data.rotation);
+            console.log('click to '+data.x+', '+data.y);
+            socket.player.rotation = Math.atan2(data.y - socket.player.y, data.x - socket.player.x);
             socket.player.x = data.x;
             socket.player.y = data.y;
-            socket.player.rotation = data.rotation;
+
 
             io.emit('move',socket.player);
         });

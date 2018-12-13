@@ -15,7 +15,7 @@ Client.askNewPlayer = function(){
 };
 
 Client.sendClick = function(x,y,rotation){
-  Client.socket.emit('click',{x:x,y:y, rotation: rotation});
+  Client.socket.emit('click',{x:x,y:y});
 };
 
 Client.socket.on('newplayer',function(data){
@@ -35,5 +35,3 @@ Client.socket.on('allplayers',function(data){
         Game.removePlayer(id);
     });
 });
-
-

@@ -2,7 +2,7 @@
 let player
 
 var Game = {};
-var playerMap = {}; 
+var playerMap = {};
 
 Game.init = function(){
     game.stage.disableVisibilityChange = true;
@@ -21,21 +21,20 @@ Game.create = function(){
   sky.inputEnabled = true;
   sky.events.onInputDown.add(Game.getCoordinates, this);
   Client.askNewPlayer()
-  
+
   console.log("Retrieved player -> " + player)
 }
- 
+
 Game.getCoordinates = function(layer, pointer){
     console.log("getCoordinates executed")
 
-    rotation = game.physics.arcade.angleToPointer(player);
-    Client.sendClick(pointer.worldX,pointer.worldY, rotation);
+    Client.sendClick(pointer.worldX,pointer.worldY);
 };
 
 Game.addNewPlayer = function(id,x,y){
-	
+
      playerMap[id] = game.add.sprite(x, y, 'barb')
-     
+
      player = playerMap[id];
 
      player.pivot.x= 44;
@@ -51,12 +50,12 @@ Game.addNewPlayer = function(id,x,y){
 	 console.log(playerMap[id])
 };
 
-Game.movePlayer = function(id ,x ,y , rotation){
+Game.movePlayer = function(id ,x ,y, rotation){
     var player = playerMap[id];
-    
+
     player.x = x;
     player.y = y;
-    
+
     angleInRads = rotation+Math.PI;
     normalised = angleInRads/(2*Math.PI);
     animationIndex =(Math.round(normalised*16)+4)%16;
@@ -74,4 +73,3 @@ Game.removePlayer = function(id){
    playerMap[id].destroy();
    delete playerMap[id];
 };
-
