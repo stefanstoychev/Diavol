@@ -53,12 +53,13 @@ Game.addNewPlayer = function(id,x,y){
 Game.movePlayer = function(id ,x ,y, rotation){
     var player = playerMap[id];
 
-    player.x = x;
-    player.y = y;
-
     angleInRads = rotation+Math.PI;
     normalised = angleInRads/(2*Math.PI);
     animationIndex =(Math.round(normalised*16)+4)%16;
+
+    var tween = game.add.tween(player);
+    tween.to({ "x": x, "y": y }, 1000);
+    tween.start();
 
     console.log('rads: ' + angleInRads + 'norm: ' + normalised + 'key: ' + animationIndex)
 

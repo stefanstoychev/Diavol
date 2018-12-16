@@ -17,12 +17,14 @@ server.listen(process.env.PORT || 8088,function(){
     console.log('Listening on '+server.address().port);
 });
 
+var movements = {};
+
 io.on('connection',function(socket){
 
     socket.on('newplayer',function(){
         socket.player = {
             id: server.lastPlayderID++,
-			      x:  150,
+			x:  150,
             y: 150
         };
 
@@ -32,11 +34,13 @@ io.on('connection',function(socket){
         socket.on('click',function(data){
             console.log('click to '+data.x+', '+data.y);
             socket.player.rotation = Math.atan2(data.y - socket.player.y, data.x - socket.player.x);
-            socket.player.x = data.x;
-            socket.player.y = data.y;
+            
+            var dx = Math.cos(socket.player.rotation) * 50;
+            var dy = Math.sin(socket.player.rotation) * 50;
 
+            var start = {"x" : socket.player["x"], "y" : socket.player["y"] };
 
-            io.emit('move',socket.player);
+            movements[socket.player.id] = { "socket": socket, "start" : start, "end" : data, "dx" : dx, "dy" : dy };
         });
 
         socket.on('disconnect',function(){
@@ -58,6 +62,37 @@ function getAllPlayers(){
     return players;
 }
 
-function randomInt (low, high) {
-    return Math.floor(Math.random() * (high - low) + low);
+var movementesTimer = setInterval(myTimer, 500);
+
+function myTimer() {
+    
+    Object.keys(movements).forEach(function(key) {
+        var value = movements[key];
+        var socket = value["socket"];
+
+        console.log(value);
+        var a = value["end"].x - value["start"].x;
+        var b = value["end"].y - value["start"].y;
+        var distance = Math.sqrt(a*a + b*b);
+            
+        console.log(distance);
+
+        if(distance < 30){
+            delete movements[key];
+        } else {
+
+        var x = value["start"].x + value["dx"];
+        var y = value["start"].y + value["dy"];
+            
+        value["start"].x = x;
+        value["start"].y = y;
+
+        socket.player.x = x;
+        socket.player.y = y;
+            
+
+        io.emit('move',socket.player);
+        console.log(value);
+        }
+    });
 }
