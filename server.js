@@ -26,7 +26,7 @@ io.on('connection',function(socket){
             id: server.lastPlayderID++,
 			x: 150,
             y: 150,
-            speed: 50
+            speed: 100
         };
 
         socket.emit('allplayers',getAllPlayers());
