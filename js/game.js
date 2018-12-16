@@ -38,7 +38,7 @@ Game.addNewPlayer = function(id,x,y){
      player = playerMap[id];
 
      player.pivot.x= 44;
-     player.pivot.y= 49;
+     player.pivot.y= 85;
 
      for(i = 0 ;i < 15; i++){
         key = 'walk' + i;
