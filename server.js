@@ -77,10 +77,10 @@ function myTimer() {
         var dx = Math.cos(player.rotation) * player.speed;
         var dy = Math.sin(player.rotation) * player.speed;
 
-        var distance = getDistance(player , movement.destination)
-        var distanceAfterMove = getDistance({x : 0, y : 0}, {x : dx, y : dy}) 
+        var distanceRemaining = getDistance(player , movement.destination)
+        var distanceDelta = getDistance({x : 0, y : 0}, {x : dx, y : dy}) 
 
-        if(distance < distanceAfterMove){
+        if(distanceRemaining < distanceDelta){
             player.x = movement.destination.x;
             player.y = movement.destination.y;
 
@@ -90,7 +90,7 @@ function myTimer() {
             player.x += dx;
             player.y += dy;
         }
-        
+
         io.emit('move', player);
     });
 }
