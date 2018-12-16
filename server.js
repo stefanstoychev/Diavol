@@ -24,23 +24,19 @@ io.on('connection',function(socket){
     socket.on('newplayer',function(){
         socket.player = {
             id: server.lastPlayderID++,
-			x:  150,
-            y: 150
+			x: 150,
+            y: 150,
+            speed: 50
         };
 
         socket.emit('allplayers',getAllPlayers());
         socket.broadcast.emit('newplayer',socket.player);
 
         socket.on('click',function(data){
-            console.log('click to '+data.x+', '+data.y);
+            console.log('click to '+ data.x + ', ' + data.y);
             socket.player.rotation = Math.atan2(data.y - socket.player.y, data.x - socket.player.x);
-            
-            var dx = Math.cos(socket.player.rotation) * 50;
-            var dy = Math.sin(socket.player.rotation) * 50;
 
-            var start = {"x" : socket.player["x"], "y" : socket.player["y"] };
-
-            movements[socket.player.id] = { "socket": socket, "start" : start, "end" : data, "dx" : dx, "dy" : dy };
+            movements[socket.player.id] = { player: socket.player, destination : data };
         });
 
         socket.on('disconnect',function(){
@@ -64,35 +60,33 @@ function getAllPlayers(){
 
 var movementesTimer = setInterval(myTimer, 500);
 
+function getDistance(pointA, pointB) {
+    var x = pointA.x - pointB.x;
+    var y = pointA.y - pointB.y;
+    var distance = Math.sqrt(x*x + y*y);
+
+    return distance;
+}
+
 function myTimer() {
     
     Object.keys(movements).forEach(function(key) {
-        var value = movements[key];
-        var socket = value["socket"];
-
-        console.log(value);
-        var a = value["end"].x - value["start"].x;
-        var b = value["end"].y - value["start"].y;
-        var distance = Math.sqrt(a*a + b*b);
-            
-        console.log(distance);
+        var movement = movements[key];
+        var player = movement.player;
+        
+        var distance = getDistance(player , movement.destination)
 
         if(distance < 30){
             delete movements[key];
         } else {
 
-        var x = value["start"].x + value["dx"];
-        var y = value["start"].y + value["dy"];
-            
-        value["start"].x = x;
-        value["start"].y = y;
+            var dx = Math.cos(player.rotation) * player.speed;
+            var dy = Math.sin(player.rotation) * player.speed;
 
-        socket.player.x = x;
-        socket.player.y = y;
-            
+            player.x += dx;
+            player.y += dy;
 
-        io.emit('move',socket.player);
-        console.log(value);
+            io.emit('move', player);
         }
     });
 }

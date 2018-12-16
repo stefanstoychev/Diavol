@@ -35,8 +35,3 @@ Client.socket.on('allplayers',function(data){
         Game.removePlayer(id);
     });
 });
-
-Client.socket.on('currenttime', function(data){
-    console.log(data);
-    }
-);
