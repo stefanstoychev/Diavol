@@ -73,20 +73,24 @@ function myTimer() {
     Object.keys(movements).forEach(function(key) {
         var movement = movements[key];
         var player = movement.player;
-        
-        var distance = getDistance(player , movement.destination)
 
-        if(distance < 30){
+        var dx = Math.cos(player.rotation) * player.speed;
+        var dy = Math.sin(player.rotation) * player.speed;
+
+        var distance = getDistance(player , movement.destination)
+        var distanceAfterMove = getDistance({x : 0, y : 0}, {x : dx, y : dy}) 
+
+        if(distance < distanceAfterMove){
+            player.x = movement.destination.x;
+            player.y = movement.destination.y;
+
             delete movements[key];
         } else {
 
-            var dx = Math.cos(player.rotation) * player.speed;
-            var dy = Math.sin(player.rotation) * player.speed;
-
             player.x += dx;
             player.y += dy;
-
-            io.emit('move', player);
         }
+        
+        io.emit('move', player);
     });
 }
