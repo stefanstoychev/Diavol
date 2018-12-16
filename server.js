@@ -17,26 +17,26 @@ server.listen(process.env.PORT || 8088,function(){
     console.log('Listening on '+server.address().port);
 });
 
+var movements = {};
+
 io.on('connection',function(socket){
 
     socket.on('newplayer',function(){
         socket.player = {
             id: server.lastPlayderID++,
-			      x:  150,
-            y: 150
+			x: 150,
+            y: 150,
+            speed: 50
         };
 
         socket.emit('allplayers',getAllPlayers());
         socket.broadcast.emit('newplayer',socket.player);
 
         socket.on('click',function(data){
-            console.log('click to '+data.x+', '+data.y);
+            console.log('click to '+ data.x + ', ' + data.y);
             socket.player.rotation = Math.atan2(data.y - socket.player.y, data.x - socket.player.x);
-            socket.player.x = data.x;
-            socket.player.y = data.y;
 
-
-            io.emit('move',socket.player);
+            movements[socket.player.id] = { player: socket.player, destination : data };
         });
 
         socket.on('disconnect',function(){
@@ -58,6 +58,39 @@ function getAllPlayers(){
     return players;
 }
 
-function randomInt (low, high) {
-    return Math.floor(Math.random() * (high - low) + low);
+var movementesTimer = setInterval(myTimer, 500);
+
+function getDistance(pointA, pointB) {
+    var x = pointA.x - pointB.x;
+    var y = pointA.y - pointB.y;
+    var distance = Math.sqrt(x*x + y*y);
+
+    return distance;
+}
+
+function myTimer() {
+    
+    Object.keys(movements).forEach(function(key) {
+        var movement = movements[key];
+        var player = movement.player;
+
+        var dx = Math.cos(player.rotation) * player.speed;
+        var dy = Math.sin(player.rotation) * player.speed;
+
+        var distanceRemaining = getDistance(player , movement.destination)
+        var distanceDelta = getDistance({x : 0, y : 0}, {x : dx, y : dy}) 
+
+        if(distanceRemaining < distanceDelta){
+            player.x = movement.destination.x;
+            player.y = movement.destination.y;
+
+            delete movements[key];
+        } else {
+
+            player.x += dx;
+            player.y += dy;
+        }
+
+        io.emit('move', player);
+    });
 }

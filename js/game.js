@@ -38,7 +38,7 @@ Game.addNewPlayer = function(id,x,y){
      player = playerMap[id];
 
      player.pivot.x= 44;
-     player.pivot.y= 49;
+     player.pivot.y= 85;
 
      for(i = 0 ;i < 15; i++){
         key = 'walk' + i;
@@ -53,12 +53,13 @@ Game.addNewPlayer = function(id,x,y){
 Game.movePlayer = function(id ,x ,y, rotation){
     var player = playerMap[id];
 
-    player.x = x;
-    player.y = y;
-
     angleInRads = rotation+Math.PI;
     normalised = angleInRads/(2*Math.PI);
     animationIndex =(Math.round(normalised*16)+4)%16;
+
+    var tween = game.add.tween(player);
+    tween.to({ "x": x, "y": y }, 1000);
+    tween.start();
 
     console.log('rads: ' + angleInRads + 'norm: ' + normalised + 'key: ' + animationIndex)
 
